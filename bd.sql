@@ -110,7 +110,6 @@ CREATE TABLE IF NOT EXISTS `bd`.`productos` (
   `tipo_prod` VARCHAR(45) NOT NULL,
   `descr_prod` VARCHAR(45) NOT NULL,
   `precio_prod` DECIMAL NOT NULL,
-  `id_local` INT NOT NULL,
   `stock_prod` INT NOT NULL,
   PRIMARY KEY (`id_prod`),
   INDEX `id_carter_idx` (`id_carter` ASC) VISIBLE,
