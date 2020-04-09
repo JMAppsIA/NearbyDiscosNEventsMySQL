@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `bd`.`personas` (
   `edad` INT NOT NULL,
   `telf` INT NOT NULL,
   `direc_per` VARCHAR(45) NOT NULL,
-  `genero_per` TEXT(20) NOT NULL,
+  `genero_per` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`id_per`))
 ENGINE = InnoDB;
 
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `bd`.`productos` (
     REFERENCES `bd`.`shows` (`id_show`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `id_local`
+  CONSTRAINT `id_local_prod`
     FOREIGN KEY (`id_local`)
     REFERENCES `bd`.`locales` (`id_local`)
     ON DELETE CASCADE
@@ -157,16 +157,15 @@ CREATE TABLE IF NOT EXISTS `bd`.`catering` (
   `precio_cater` DECIMAL NOT NULL,
   `img_cater` VARCHAR(45) NOT NULL,
   `descr_cater` VARCHAR(500) NOT NULL,
-  `id_local` INT NOT NULL,
   PRIMARY KEY (`id_cater`),
   INDEX `id_local_idx` (`id_local` ASC) VISIBLE,
   INDEX `id_prod_idx` (`id_prod` ASC) VISIBLE,
-  CONSTRAINT `id_local`
+  CONSTRAINT `id_local_catering`
     FOREIGN KEY (`id_local`)
     REFERENCES `bd`.`locales` (`id_local`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `id_prod`
+  CONSTRAINT `id_prod_catering`
     FOREIGN KEY (`id_prod`)
     REFERENCES `bd`.`productos` (`id_prod`)
     ON DELETE CASCADE
@@ -187,7 +186,7 @@ CREATE TABLE IF NOT EXISTS `bd`.`horarios_local` (
   `estado_local` TEXT(30) NOT NULL,
   PRIMARY KEY (`dia_hor_local`),
   INDEX `id_local_idx` (`id_local` ASC) VISIBLE,
-  CONSTRAINT `id_local`
+  CONSTRAINT `id_local_horarios_local`
     FOREIGN KEY (`id_local`)
     REFERENCES `bd`.`locales` (`id_local`)
     ON DELETE CASCADE
@@ -212,7 +211,7 @@ CREATE TABLE IF NOT EXISTS `bd`.`locales` (
   `descrip_local` VARCHAR(500) NOT NULL,
   `telf_local` INT(9) NOT NULL,
   `direc_local` VARCHAR(45) NOT NULL,
-  `estado_local` TEXT(30) NOT NULL,
+  `id_estado` INT NOT NULL,
   PRIMARY KEY (`id_local`),
   UNIQUE INDEX `lat_local_UNIQUE` (`lat_local` ASC) VISIBLE,
   UNIQUE INDEX `long_local_UNIQUE` (`long_local` ASC) VISIBLE,
@@ -221,17 +220,17 @@ CREATE TABLE IF NOT EXISTS `bd`.`locales` (
   INDEX `id_show_idx` (`id_show` ASC) VISIBLE,
   INDEX `id_prod_idx` (`id_prod` ASC) VISIBLE,
   INDEX `dia_hor_local_idx` (`dia_hor_local` ASC) VISIBLE,
-  CONSTRAINT `id_cater`
+  CONSTRAINT `id_cater_locales`
     FOREIGN KEY (`id_cater`)
     REFERENCES `bd`.`catering` (`id_cater`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `id_show`
+  CONSTRAINT `id_show_locales`
     FOREIGN KEY (`id_show`)
     REFERENCES `bd`.`shows` (`id_show`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `id_prod`
+  CONSTRAINT `id_prod_locales`
     FOREIGN KEY (`id_prod`)
     REFERENCES `bd`.`productos` (`id_prod`)
     ON DELETE CASCADE
@@ -251,7 +250,7 @@ CREATE TABLE IF NOT EXISTS `bd`.`orden_compra` (
   `id_orden` INT NOT NULL,
   `usuarios_id_usu` INT NOT NULL,
   `fecha_orden` DATETIME NOT NULL,
-  `pais` VARCHAR(45) NULL,
+  `pais` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id_orden`),
   INDEX `fk_orden_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
   CONSTRAINT `fk_orden_usuarios1`
@@ -313,7 +312,14 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `bd`.`tipo_tarjeta` (
   `id_tipo_tarjeta` INT NOT NULL,
   `nomb_tipo_tarjeta` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_tipo_tarjeta`))
+  `tarjeta_usuario_id_tarjeta` INT NOT NULL,
+  PRIMARY KEY (`id_tipo_tarjeta`),
+  INDEX `fk_tipo_tarjeta_tarjeta_usuario1_idx` (`tarjeta_usuario_id_tarjeta` ASC) VISIBLE,
+  CONSTRAINT `fk_tipo_tarjeta_tarjeta_usuario1`
+    FOREIGN KEY (`tarjeta_usuario_id_tarjeta`)
+    REFERENCES `bd`.`tarjeta_usuario` (`id_tarjeta`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -322,19 +328,22 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `bd`.`reserva` (
   `id_reserva` INT NOT NULL,
-  `tarjeta_usuario_id_tarjeta` INT NOT NULL,
+  `nom_reserva` VARCHAR(45) NOT NULL,
   `usuarios_id_usu` INT NOT NULL,
+  `productos_id_prod` INT NOT NULL,
+  `fecha_reserva` DATETIME NOT NULL,
+  `id_estado` INT NOT NULL,
   PRIMARY KEY (`id_reserva`),
-  INDEX `fk_reserva_tarjeta_usuario1_idx` (`tarjeta_usuario_id_tarjeta` ASC) VISIBLE,
   INDEX `fk_reserva_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
-  CONSTRAINT `fk_reserva_tarjeta_usuario1`
-    FOREIGN KEY (`tarjeta_usuario_id_tarjeta`)
-    REFERENCES `bd`.`tarjeta_usuario` (`id_tarjeta`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+  INDEX `fk_reserva_productos1_idx` (`productos_id_prod` ASC) VISIBLE,
   CONSTRAINT `fk_reserva_usuarios1`
     FOREIGN KEY (`usuarios_id_usu`)
     REFERENCES `bd`.`usuarios` (`id_usu`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_reserva_productos1`
+    FOREIGN KEY (`productos_id_prod`)
+    REFERENCES `bd`.`productos` (`id_prod`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
