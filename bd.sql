@@ -443,8 +443,8 @@ IN `idPerson` INT, IN `firstName` VARCHAR(40), IN `secondName` VARCHAR(40),
 IN `firstLastName` VARCHAR(40), IN `secondLastName` VARCHAR(40),
 IN `fullName` VARCHAR(40), IN `documentType`INT,
 IN `documentNumber` VARCHAR(12),  IN `bornDate` DATE,
-IN `age` INT, IN `mobileNumber` INT, IN `address` INT, 
-IN `genre` INT, IN `idUser` INT, IN `userName` VARCHAR(45),
+IN `age` INT, IN `mobileNumber` INT, IN `address` VARCHAR(45), 
+IN `genre` CHAR(1), IN `idUser` INT, IN `userName` VARCHAR(45),
 IN `passwordUser` VARCHAR(45), IN `email` VARCHAR(45),
 IN `sourceUser` VARCHAR(45), IN `userStatus` INT)
 BEGIN
@@ -460,7 +460,7 @@ BEGIN
 			(firstName,secondName,firstLastName,
 			secondLastName,fullName,
 			documentType,documentNumber,bornDate,
-			age,addressr,genre);
+			age,address,genre);
         
         SET personId = last_insert_id();
         
