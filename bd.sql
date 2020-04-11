@@ -9,11 +9,18 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- Schema bd
 -- -----------------------------------------------------
 
--- -----------------------------------------------------
--- Schema bd
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `bd` DEFAULT CHARACTER SET utf8 ;
 USE `bd` ;
+
+
+-- -----------------------------------------------------
+-- Table `bd`.`estados`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`estados` (
+`id_estado` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`nom_estado` VARCHAR  (45) NOT NULL
+)
+ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `bd`.`personas`
@@ -56,8 +63,14 @@ CREATE TABLE IF NOT EXISTS `bd`.`usuarios` (
     FOREIGN KEY (`id_per`)
     REFERENCES `bd`.`personas` (`id_per`)
     ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `id_estado_usuarios`
+    FOREIGN KEY (`id_estado`)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
 
 
 -- -----------------------------------------------------
@@ -73,25 +86,59 @@ CREATE TABLE IF NOT EXISTS `bd`.`locales` (
   `descrip_local` VARCHAR(500) NOT NULL,
   `telf_local` INT NOT NULL,
   `direc_local` VARCHAR(45) NOT NULL,
-  `estado_local` TEXT(30) NOT NULL,
+  `id_estado` INT NOT NULL,
+  `ranking` DECIMAL(18,2) NULL,
   PRIMARY KEY (`id_local`),
   UNIQUE INDEX `lat_local_UNIQUE` (`lat_local` ASC) VISIBLE,
   UNIQUE INDEX `long_local_UNIQUE` (`long_local` ASC) VISIBLE,
-  UNIQUE INDEX `telf_local_UNIQUE` (`telf_local` ASC) VISIBLE)
+  UNIQUE INDEX `telf_local_UNIQUE` (`telf_local` ASC) VISIBLE,
+  CONSTRAINT `id_estado_locales`
+    FOREIGN KEY (`id_estado`)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `bd`.`votacion_local`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`votacion_local`(
+`id_votacion_local` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`votacion` INT NOT NULL,
+`id_usu` INT NOT NULL,
+`id_local` INT NOT NULL,
+`fecha_votacion` DATE NOT NULL,
+CONSTRAINT `id_usu_votacion_local`
+    FOREIGN KEY (`id_usu`)
+    REFERENCES `bd`.`usuario` (`id_usu`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE,
+CONSTRAINT `id_local_votacion_local`
+    FOREIGN KEY (`id_local`)
+    REFERENCES `bd`.`locales` (`id_local`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE
+) ;
 
 
 -- -----------------------------------------------------
 -- Table `bd`.`horarios_local`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `bd`.`horarios_local` (
+  `id_horarios_local` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `dia_hor_local` INT NOT NULL,
   `mes_hor_local` DATE NOT NULL,
   `año_hor_local` YEAR NOT NULL,
   `fecha_hor_local` DATETIME NOT NULL,
   `hora_hor_local` TIME NOT NULL,
-  `estado_local` TEXT(30) NOT NULL,
-  PRIMARY KEY (`dia_hor_local`))
+  `id_local` INT NOT NULL,
+  CONSTRAINT `id_local_horarios_local`
+  FOREIGN KEY (`id_local`)
+  REFERENCES `db`.`locales`(`id_local`) 
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION
+  )
 ENGINE = InnoDB;
 
 
@@ -106,175 +153,15 @@ CREATE TABLE IF NOT EXISTS `bd`.`catering` (
   `img_cater` VARCHAR(45) NOT NULL,
   `descr_cater` VARCHAR(500) NOT NULL,
   `id_local` INT NOT NULL,
-  PRIMARY KEY (`id_cater`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bd`.`shows`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`shows` (
-  `id_show` INT NOT NULL AUTO_INCREMENT,
-  `id_local` INT NOT NULL,
-  `nomb_show` VARCHAR(45) NOT NULL,
-  `img_show` VARCHAR(45) NOT NULL,
-  `descr_show` VARCHAR(500) NOT NULL,
-  `precio_show` DECIMAL NOT NULL,
-  PRIMARY KEY (`id_show`),
-  INDEX `id_local_idx` (`id_local` ASC) VISIBLE,
-  CONSTRAINT `id_local`
-    FOREIGN KEY (`id_local`)
-    REFERENCES `bd`.`locales` (`id_local`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bd`.`productos`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`productos` (
-  `id_prod` INT NOT NULL AUTO_INCREMENT,
-  `id_carter` INT NOT NULL,
-  `id_show` INT NOT NULL,
-  `id_local` INT NOT NULL,
-  `usuarios_id_usu` INT NOT NULL,
-  `nom_prod` VARCHAR(45) NOT NULL,
-  `tipo_prod` VARCHAR(45) NOT NULL,
-  `descr_prod` VARCHAR(45) NOT NULL,
-  `precio_prod` DECIMAL NOT NULL,
-  `stock_prod` INT NOT NULL,
-  PRIMARY KEY (`id_prod`),
-  INDEX `id_carter_idx` (`id_carter` ASC) VISIBLE,
-  INDEX `id_show_idx` (`id_show` ASC) VISIBLE,
-  INDEX `id_local_idx` (`id_local` ASC) VISIBLE,
-  INDEX `fk_productos_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
-  CONSTRAINT `id_carter_productos`
-    FOREIGN KEY (`id_carter`)
-    REFERENCES `bd`.`catering` (`id_cater`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `id_show_productos`
-    FOREIGN KEY (`id_show`)
-    REFERENCES `bd`.`shows` (`id_show`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `id_local_productos`
-    FOREIGN KEY (`id_local`)
-    REFERENCES `bd`.`locales` (`id_local`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_productos_usuarios1`
-    FOREIGN KEY (`usuarios_id_usu`)
-    REFERENCES `bd`.`usuarios` (`id_usu`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bd`.`orden_compra`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`orden_compra` (
-  `id_orden` INT NOT NULL,
-  `usuarios_id_usu` INT NOT NULL,
-  `fecha_orden` DATETIME NOT NULL,
-  `pais` VARCHAR(45) NULL,
-  `productos_id_prod` INT NOT NULL,
-  PRIMARY KEY (`id_orden`),
-  INDEX `fk_orden_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
-  INDEX `fk_orden_compra_productos1_idx` (`productos_id_prod` ASC) VISIBLE,
-  CONSTRAINT `fk_orden_usuarios1`
-    FOREIGN KEY (`usuarios_id_usu`)
-    REFERENCES `bd`.`usuarios` (`id_usu`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_orden_compra_productos1`
-    FOREIGN KEY (`productos_id_prod`)
-    REFERENCES `bd`.`productos` (`id_prod`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bd`.`tarjeta_usuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`tarjeta_usuario` (
-  `id_tarjeta` INT NOT NULL,
-  `usuarios_id_usu` INT NOT NULL,
-  `id_ent_banc` VARCHAR(45) NOT NULL,
-  `num_tarj` INT NOT NULL,
-  `tipo_tarj` VARCHAR(45) NOT NULL,
   `id_estado` INT NOT NULL,
-  PRIMARY KEY (`id_tarjeta`),
-  UNIQUE INDEX `id_tarjeta_UNIQUE` (`id_tarjeta` ASC) VISIBLE,
-  UNIQUE INDEX `id_ent_banc_UNIQUE` (`id_ent_banc` ASC) VISIBLE,
-  INDEX `fk_tarjeta_usuario_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
-  CONSTRAINT `fk_tarjeta_usuario_usuarios1`
-    FOREIGN KEY (`usuarios_id_usu`)
-    REFERENCES `bd`.`usuarios` (`id_usu`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bd`.`categ_prod`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`categ_prod` (
-  `id_cat_prod` INT NOT NULL,
-  `nom_cat_prod` VARCHAR(45) NOT NULL,
-  `productos_id_prod` INT NOT NULL,
-  PRIMARY KEY (`id_cat_prod`),
-  INDEX `fk_categ_prod_productos1_idx` (`productos_id_prod` ASC) VISIBLE,
-  CONSTRAINT `fk_categ_prod_productos1`
-    FOREIGN KEY (`productos_id_prod`)
-    REFERENCES `bd`.`productos` (`id_prod`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bd`.`tipo_tarjeta`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`tipo_tarjeta` (
-  `id_tipo_tarjeta` INT NOT NULL,
-  `nomb_tipo_tarjeta` VARCHAR(45) NOT NULL,
-  `tarjeta_usuario_id_tarjeta` INT NOT NULL,
-  PRIMARY KEY (`id_tipo_tarjeta`),
-  INDEX `fk_tipo_tarjeta_tarjeta_usuario1_idx` (`tarjeta_usuario_id_tarjeta` ASC) VISIBLE,
-  CONSTRAINT `fk_tipo_tarjeta_tarjeta_usuario1`
-    FOREIGN KEY (`tarjeta_usuario_id_tarjeta`)
-    REFERENCES `bd`.`tarjeta_usuario` (`id_tarjeta`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bd`.`reserva`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`reserva` (
-  `id_reserva` INT NOT NULL,
-  `tarjeta_usuario_id_tarjeta` INT NOT NULL,
-  `usuarios_id_usu` INT NOT NULL,
-  `id_estado` INT NOT NULL,
-  PRIMARY KEY (`id_reserva`),
-  INDEX `fk_reserva_tarjeta_usuario1_idx` (`tarjeta_usuario_id_tarjeta` ASC) VISIBLE,
-  INDEX `fk_reserva_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
-  UNIQUE INDEX `id_reserva_UNIQUE` (`id_reserva` ASC) VISIBLE,
-  CONSTRAINT `fk_reserva_tarjeta_usuario1`
-    FOREIGN KEY (`tarjeta_usuario_id_tarjeta`)
-    REFERENCES `bd`.`tarjeta_usuario` (`id_tarjeta`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_reserva_usuarios1`
-    FOREIGN KEY (`usuarios_id_usu`)
-    REFERENCES `bd`.`usuarios` (`id_usu`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  PRIMARY KEY (`id_cater`),
+  CONSTRAINT `id_estado_catering`
+    FOREIGN KEY (`id_estado`)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    )
+    
 ENGINE = InnoDB;
 
 
@@ -298,6 +185,236 @@ CREATE TABLE IF NOT EXISTS `bd`.`locales_has_catering` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+
+- -----------------------------------------------------
+-- Table `bd`.`shows`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`shows` (
+  `id_show` INT NOT NULL AUTO_INCREMENT,
+  `id_local` INT NOT NULL,
+  `nomb_show` VARCHAR(45) NOT NULL,
+  `img_show` VARCHAR(45) NOT NULL,
+  `descr_show` VARCHAR(500) NOT NULL,
+  `precio_show` DECIMAL NOT NULL,
+  `id_estado` INT NOT NULL,
+  PRIMARY KEY (`id_show`),
+  INDEX `id_local_idx` (`id_local` ASC) VISIBLE,
+  CONSTRAINT `id_local`
+    FOREIGN KEY (`id_local`)
+    REFERENCES `bd`.`locales` (`id_local`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    CONSTRAINT `id_estado_shows`
+    FOREIGN KEY (`id_estado`)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `bd`.`categ_prod`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`categ_prod` (
+  `id_cat_prod` INT NOT NULL AUTO_INCREMENT,
+  `nom_cat_prod` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_cat_prod`)
+  )
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `bd`.`productos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`productos` (
+  `id_prod` INT NOT NULL AUTO_INCREMENT,
+  `id_cater` INT NOT NULL,
+  `usuarios_id_usu` INT NOT NULL,
+  `nom_prod` VARCHAR(45) NOT NULL,
+  `tipo_prod` VARCHAR(45) NOT NULL,
+  `descr_prod` VARCHAR(45) NOT NULL,
+  `precio_prod` DECIMAL NOT NULL,
+  `stock_prod` INT NOT NULL,
+  `id_cat_prod` INT NOT NULL,
+  PRIMARY KEY (`id_prod`),
+  INDEX `id_cater_idx` (`id_cater` ASC) VISIBLE,
+  INDEX `fk_productos_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
+  CONSTRAINT `id_cater_productos`
+    FOREIGN KEY (`id_cater`)
+    REFERENCES `bd`.`catering` (`id_cater`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_productos_usuarios1`
+    FOREIGN KEY (`usuarios_id_usu`)
+    REFERENCES `bd`.`usuarios` (`id_usu`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `id_cat_prod_productos`
+    FOREIGN KEY (`id_cat_prod`)
+    REFERENCES `bd`.`categ_prod` (`id_cat_prod`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    )
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `bd`.`orden_detalle`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`orden_detalle`(
+	`id_orden_detalle` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `id_local` INT NOT NULL,
+    `id_prod` INT NOT NULL,
+    `id_show` INT NOT NULL,
+    CONSTRAINT `id_local_orden_detalle`
+    FOREIGN KEY (`id_local`)
+    REFERENCES `bd`.`locales` (`id_local`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    CONSTRAINT `id_prod_orden_detalle`
+    FOREIGN KEY (`id_prod`)
+    REFERENCES `bd`.`productos` (`id_prod`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    CONSTRAINT `id_show_orden_detalle`
+    FOREIGN KEY (`id_show`)
+    REFERENCES `bd`.`shows` (`id_show`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `bd`.`orden_compra`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`orden_compra` (
+  `id_orden` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `usuarios_id_usu` INT NOT NULL,
+  `fecha_orden` DATETIME NOT NULL,
+  `id_orden_detalle` INT NOT NULL,
+  CONSTRAINT `id_orden_detalle_orden_compra`
+  FOREIGN KEY (`id_orden_detalle`)
+  REFERENCES `bd`.`orden_detalle` (`id_orden_detalle`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
+  )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `bd`.`entidad_bancaria`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `entidad_bancaria`(
+`id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`descripcion` VARCHAR(45)
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `bd`.`tipo_tarjeta`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tipo_tarjeta`(
+`id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`descripcion` VARCHAR(45)
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `bd`.`tarjeta_usuario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`tarjeta_usuario` (
+  `id_tarjeta` INT NOT NULL,
+  `usuarios_id_usu` INT NOT NULL,
+  `id_entidad_bancaria` INT NOT NULL,
+  `num_tarj` INT NOT NULL,
+  `id_tipo_tarjeta` INT NOT NULL,
+  `id_estado` INT NOT NULL,
+  PRIMARY KEY (`id_tarjeta`),
+  UNIQUE INDEX `id_tarjeta_UNIQUE` (`id_tarjeta` ASC) VISIBLE,
+  INDEX `fk_tarjeta_usuario_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
+  CONSTRAINT `fk_tarjeta_usuario_usuarios1`
+    FOREIGN KEY (`usuarios_id_usu`)
+    REFERENCES `bd`.`usuarios` (`id_usu`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+   CONSTRAINT `id_entidad_bancaria_tarjeta_usuario`
+	FOREIGN KEY (`id_entidad_bancaria`)
+    REFERENCES `bd`.`entidad_bancaria` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `id_tipo_tarjeta_tarjeta_usuario`
+	FOREIGN KEY (`id_tipo_tarjeta`)
+    REFERENCES `bd`.`tipo_tarjeta` (`id`)
+    ON DELETE NO ACTION
+	ON UPDATE NO ACTION
+    )
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `bd`.`reserva_detalle`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`reserva_detalle`(
+`id_reserva_detalle` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`descripcion` INT NOT NULL,
+`id_local` INT NOT NULL,
+`id_prod` INT NOT NULL,
+`id_show` INT NOT NULL,
+`id_horarios_local` INT NOT NULL,
+`fecha_reserva` DATETIME NOT NULL,
+CONSTRAINT `id_local_reserva_detalle`
+FOREIGN KEY (`id_local`)
+REFERENCES `bd`.`locales` (`id_local`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
+CONSTRAINT `id_prod_reserva_detalle`
+FOREIGN KEY (`id_prod`)
+REFERENCES `bd`.`productos`  (`id_prod`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
+CONSTRAINT `id_show_reserva_detalle`
+FOREIGN KEY (`id_show`)
+REFERENCES `bd`.`shows`  (`id_show`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION,
+CONSTRAINT `id_horarios_local_reserva_detalle`
+FOREIGN KEY (`id_horarios_local`)
+REFERENCES `bd`.`horarios_local`  (`id_horarios_local`)
+ON DELETE NO ACTION
+ON UPDATE NO ACTION
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `bd`.`reserva`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`reserva` (
+  `id_reserva` INT NOT NULL AUTO_INCREMENT,
+  `usuarios_id_usu` INT NOT NULL,
+  `id_estado` INT NOT NULL,
+  `id_reserva_detalle` INT NOT NULL,
+  PRIMARY KEY (`id_reserva`),
+  INDEX `fk_reserva_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
+  UNIQUE INDEX `id_reserva_UNIQUE` (`id_reserva` ASC) VISIBLE,
+  CONSTRAINT `fk_reserva_usuarios1`
+    FOREIGN KEY (`usuarios_id_usu`)
+    REFERENCES `bd`.`usuarios` (`id_usu`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `id_reserva_detalle`
+    FOREIGN KEY (`id_reserva_detalle`)
+    REFERENCES `bd`.`reserva.detalle` (`id_reserva_detalle`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `id_estado_reserva`
+    FOREIGN KEY (`id_estado`)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    )
+ENGINE = InnoDB;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
