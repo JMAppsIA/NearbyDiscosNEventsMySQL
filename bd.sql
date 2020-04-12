@@ -485,7 +485,7 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`reserva` (
     )
 ENGINE = InnoDB;
 
-ALTER TABLE `nearbydiscosnevents`.`personas` 
+ALTER TABLE `bd`.`personas` 
 CHANGE COLUMN `pri_nomb` `pri_nomb` VARCHAR(50) NOT NULL ,
 CHANGE COLUMN `seg_nomb` `seg_nomb` VARCHAR(50) NOT NULL ,
 CHANGE COLUMN `pri_apel` `pri_apel` VARCHAR(50) NOT NULL ,
@@ -496,19 +496,19 @@ CHANGE COLUMN `num_doc` `num_doc` VARCHAR(12) NOT NULL,
 CHANGE COLUMN `fec_nac` `fec_nac` DATE NOT NULL ,
 CHANGE COLUMN `genero_per` `genero_per` CHAR NOT NULL ;
 
-ALTER TABLE `nearbydiscosnevents`.`personas`
+ALTER TABLE `bd`.`personas`
 DROP COLUMN `telf`;
 
-ALTER TABLE `nearbydiscosnevents`.`usuarios` 
+ALTER TABLE `bd`.`usuarios` 
 CHANGE COLUMN `nom_usu` `nom_usu` VARCHAR(45) NOT NULL ,
-CHANGE COLUMN `origen_usu` `origen_usu` VARCHAR(10) NOT NULL ;
-
-
+CHANGE COLUMN `origen_usu` `origen_usu` VARCHAR(10) NOT NULL ,
+CHANGE COLUMN `pass_usu` `pass_usu` LONGTEXT NOT NULL ,
+DROP INDEX `pass_usu_UNIQUE` ;
 
 DROP procedure IF EXISTS `SP_USER_GLOBAL`;
 
 DELIMITER $$
-USE `nearbydiscosnevents`$$
+USE `bd`$$
 CREATE PROCEDURE `SP_USER_GLOBAL` (IN `vAccion` VARCHAR(45),
 IN `idPerson` INT, IN `firstName` VARCHAR(40), IN `secondName` VARCHAR(40),
 IN `firstLastName` VARCHAR(40), IN `secondLastName` VARCHAR(40),
@@ -516,7 +516,7 @@ IN `fullName` VARCHAR(40), IN `documentType`INT,
 IN `documentNumber` VARCHAR(12),  IN `bornDate` DATE,
 IN `age` INT, IN `mobileNumber` INT, IN `address` VARCHAR(45), 
 IN `genre` CHAR(1), IN `idUser` INT, IN `userName` VARCHAR(45),
-IN `passwordUser` VARCHAR(45), IN `email` VARCHAR(45),
+IN `passwordUser` LONGTEXT, IN `email` VARCHAR(45),
 IN `sourceUser` VARCHAR(45), IN `userStatus` INT)
 BEGIN
 	DECLARE personId INT;
@@ -550,13 +550,15 @@ BEGIN
                 P.seg_apel as secondLastName, P.nom_comp as fullName, P.tip_doc as documentType,
                 P.num_doc as documentNumber, P.fec_nac as bornDate, P.direc_per as address,
                 P.genero_per as genre, U.nom_usu as userName, U.email_usu as email, 
-                U.telf_usu as mobileNumber, U.id_estado as userStatus
+                U.telf_usu as mobileNumber, E.nom_estado as userStatus
             FROM 
 				USUARIOS U 
 			INNER JOIN PERSONAS P ON P.id_per = U.id_per 
+            INNER JOIN ESTADOS E ON E.id_estado = U.id_estado
             WHERE 
 				U.nom_usu = userName 
-				OR U.pass_usu = passwordUser;
+				AND U.pass_usu = passwordUser
+                AND U.id_estado = 1;
 	END IF;
 	
     IF vAccion = "obtener" THEN
@@ -586,6 +588,10 @@ BEGIN
     IF vAccion = "eliminar" THEN
 		DELETE FROM 
 			USUARIOS
+		WHERE id_per = idPerson AND nom_usu = userName;
+        
+        DELETE FROM 
+			PERSONAS
 		WHERE id_per = idPerson;
 	END IF;
     
@@ -606,6 +612,7 @@ BEGIN
 END$$
 
 DELIMITER ;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
