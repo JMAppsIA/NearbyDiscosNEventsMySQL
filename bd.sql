@@ -1,4 +1,3 @@
-
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -6,17 +5,17 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema bd
+-- Schema nearbydiscosnevents
 -- -----------------------------------------------------
 
-CREATE SCHEMA IF NOT EXISTS `bd` DEFAULT CHARACTER SET utf8 ;
-USE `bd` ;
+CREATE SCHEMA IF NOT EXISTS `nearbydiscosnevents` DEFAULT CHARACTER SET utf8 ;
+USE `nearbydiscosnevents` ;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`estados`
+-- Table `nearbydiscosnevents`.`estados`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`estados` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`estados` (
 `id_estado` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 `nom_estado` VARCHAR  (45) NOT NULL
 )
@@ -39,9 +38,9 @@ ALTER TABLE estados AUTO_INCREMENT = 1;
 select * from estados;
 
 -- -----------------------------------------------------
--- Table `bd`.`personas`
+-- Table `nearbydiscosnevents`.`personas`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`personas` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`personas` (
   `id_per` INT NOT NULL AUTO_INCREMENT,
   `pri_nomb` TEXT(45) NOT NULL,
   `seg_nomb` TEXT(45) NOT NULL,
@@ -90,9 +89,9 @@ values (default,'facebook'),
 select * from origen_usuarios;
 
 -- -----------------------------------------------------
--- Table `bd`.`usuarios`
+-- Table `nearbydiscosnevents`.`usuarios`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`usuarios` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`usuarios` (
   `id_usu` INT NOT NULL AUTO_INCREMENT,
   `id_per` INT NOT NULL,
   `nom_usu` TEXT(45) NOT NULL,
@@ -136,9 +135,9 @@ where telf_usu = '943697340';
 select * from usuarios;
 
 -- -----------------------------------------------------
--- Table `bd`.`locales`
+-- Table `nearbydiscosnevents`.`locales`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`locales` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`locales` (
   `id_local` INT NOT NULL,
   `nom_local` VARCHAR(45) NOT NULL,
   `img_local` VARCHAR(45) NOT NULL,
@@ -164,9 +163,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`votacion_local`
+-- Table `nearbydiscosnevents`.`votacion_local`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`votacion_local`(
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`votacion_local`(
 `id_votacion_local` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 `votacion` INT NOT NULL,
 `id_usu` INT NOT NULL,
@@ -174,21 +173,21 @@ CREATE TABLE IF NOT EXISTS `bd`.`votacion_local`(
 `fecha_votacion` DATE NOT NULL,
 CONSTRAINT `id_usu_votacion_local`
     FOREIGN KEY (`id_usu`)
-    REFERENCES `bd`.`usuario` (`id_usu`)
+    REFERENCES `nearbydiscosnevents`.`usuario` (`id_usu`)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
 CONSTRAINT `id_local_votacion_local`
     FOREIGN KEY (`id_local`)
-    REFERENCES `bd`.`locales` (`id_local`)
+    REFERENCES `nearbydiscosnevents`.`locales` (`id_local`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 ) ;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`horarios_local`
+-- Table `nearbydiscosnevents`.`horarios_local`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`horarios_local` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`horarios_local` (
   `id_horarios_local` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `dia_hor_local` INT NOT NULL,
   `mes_hor_local` DATE NOT NULL,
@@ -206,9 +205,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`catering`
+-- Table `nearbydiscosnevents`.`catering`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`catering` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`catering` (
   `id_cater` INT NOT NULL AUTO_INCREMENT,
   `nom_cater` VARCHAR(45) NOT NULL,
   `tipo_cater` VARCHAR(45) NOT NULL,
@@ -229,9 +228,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`locales_has_catering`
+-- Table `nearbydiscosnevents`.`locales_has_catering`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`locales_has_catering` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`locales_has_catering` (
   `locales_id_local` INT NOT NULL,
   `catering_id_cater` INT NOT NULL,
   PRIMARY KEY (`locales_id_local`, `catering_id_cater`),
@@ -239,21 +238,21 @@ CREATE TABLE IF NOT EXISTS `bd`.`locales_has_catering` (
   INDEX `fk_locales_has_catering_locales1_idx` (`locales_id_local` ASC) VISIBLE,
   CONSTRAINT `fk_locales_has_catering_locales1`
     FOREIGN KEY (`locales_id_local`)
-    REFERENCES `bd`.`locales` (`id_local`)
+    REFERENCES `nearbydiscosnevents`.`locales` (`id_local`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_locales_has_catering_catering1`
     FOREIGN KEY (`catering_id_cater`)
-    REFERENCES `bd`.`catering` (`id_cater`)
+    REFERENCES `nearbydiscosnevents`.`catering` (`id_cater`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 - -----------------------------------------------------
--- Table `bd`.`shows`
+-- Table `nearbydiscosnevents`.`shows`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`shows` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`shows` (
   `id_show` INT NOT NULL AUTO_INCREMENT,
   `id_local` INT NOT NULL,
   `nomb_show` VARCHAR(45) NOT NULL,
@@ -278,9 +277,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`categ_prod`
+-- Table `nearbydiscosnevents`.`categ_prod`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`categ_prod` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`categ_prod` (
   `id_cat_prod` INT NOT NULL AUTO_INCREMENT,
   `nom_cat_prod` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id_cat_prod`)
@@ -291,9 +290,9 @@ ENGINE = InnoDB;
 DROP TABLE categ_prod;
 select * from categ_prod;
 -- -----------------------------------------------------
--- Table `bd`.`productos`
+-- Table `nearbydiscosnevents`.`productos`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`productos` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`productos` (
   `id_prod` INT NOT NULL AUTO_INCREMENT,
   `id_cater` INT NOT NULL,
   `usuarios_id_usu` INT NOT NULL,
@@ -313,21 +312,21 @@ CREATE TABLE IF NOT EXISTS `bd`.`productos` (
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_productos_usuarios1`
     FOREIGN KEY (`usuarios_id_usu`)
-    REFERENCES `bd`.`usuarios` (`id_usu`)
+    REFERENCES `nearbydiscosnevents`.`usuarios` (`id_usu`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
     CONSTRAINT `id_cat_prod_productos`
     FOREIGN KEY (`id_cat_prod`)
-    REFERENCES `bd`.`categ_prod` (`id_cat_prod`)
+    REFERENCES `nearbydiscosnevents`.`categ_prod` (`id_cat_prod`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     )
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `bd`.`orden_detalle`
+-- Table `nearbydiscosnevents`.`orden_detalle`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`orden_detalle`(
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`orden_detalle`(
 	`id_orden_detalle` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `id_local` INT NOT NULL,
     `id_prod` INT NOT NULL,
@@ -352,9 +351,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`orden_compra`
+-- Table `nearbydiscosnevents`.`orden_compra`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`orden_compra` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`orden_compra` (
   `id_orden` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `usuarios_id_usu` INT NOT NULL,
   `fecha_orden` DATETIME NOT NULL,
@@ -369,7 +368,7 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`entidad_bancaria`
+-- Table `nearbydiscosnevents`.`entidad_bancaria`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `entidad_bancaria`(
 `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -379,7 +378,7 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `bd`.`tipo_tarjeta`
+-- Table `nearbydiscosnevents`.`tipo_tarjeta`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tipo_tarjeta`(
 `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -388,7 +387,7 @@ CREATE TABLE IF NOT EXISTS `tipo_tarjeta`(
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `bd`.`tarjeta_usuario`
+-- Table `nearbydiscosnevents`.`tarjeta_usuario`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `bd`.`tarjeta_usuario` (
   `id_tarjeta` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -402,17 +401,17 @@ CREATE TABLE IF NOT EXISTS `bd`.`tarjeta_usuario` (
   INDEX `fk_tarjeta_usuario_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
   CONSTRAINT `fk_tarjeta_usuario_usuarios1`
     FOREIGN KEY (`usuarios_id_usu`)
-    REFERENCES `bd`.`usuarios` (`id_usu`)
+    REFERENCES `nearbydiscosnevents`.`usuarios` (`id_usu`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
    CONSTRAINT `id_entidad_bancaria_tarjeta_usuario`
 	FOREIGN KEY (`id_entidad_bancaria`)
-    REFERENCES `bd`.`entidad_bancaria` (`id`)
+    REFERENCES `nearbydiscosnevents`.`entidad_bancaria` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
     CONSTRAINT `id_tipo_tarjeta_tarjeta_usuario`
 	FOREIGN KEY (`id_tipo_tarjeta`)
-    REFERENCES `bd`.`tipo_tarjeta` (`id`)
+    REFERENCES `nearbydiscosnevents`.`tipo_tarjeta` (`id`)
     ON DELETE NO ACTION
 	ON UPDATE NO ACTION,
     CONSTRAINT `id_estado`
@@ -424,9 +423,9 @@ CREATE TABLE IF NOT EXISTS `bd`.`tarjeta_usuario` (
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `bd`.`reserva_detalle`
+-- Table `nearbydiscosnevents`.`reserva_detalle`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`reserva_detalle`(
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`reserva_detalle`(
 `id_reserva_detalle` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 `descripcion` INT NOT NULL,
 `id_local` INT NOT NULL,
@@ -436,31 +435,31 @@ CREATE TABLE IF NOT EXISTS `bd`.`reserva_detalle`(
 `fecha_reserva` DATETIME NOT NULL,
 CONSTRAINT `id_local_reserva_detalle`
 FOREIGN KEY (`id_local`)
-REFERENCES `bd`.`locales` (`id_local`)
+REFERENCES `nearbydiscosnevents`.`locales` (`id_local`)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION,
 CONSTRAINT `id_prod_reserva_detalle`
 FOREIGN KEY (`id_prod`)
-REFERENCES `bd`.`productos`  (`id_prod`)
+REFERENCES `nearbydiscosnevents`.`productos`  (`id_prod`)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION,
 CONSTRAINT `id_show_reserva_detalle`
 FOREIGN KEY (`id_show`)
-REFERENCES `bd`.`shows`  (`id_show`)
+REFERENCES `nearbydiscosnevents`.`shows`  (`id_show`)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION,
 CONSTRAINT `id_horarios_local_reserva_detalle`
 FOREIGN KEY (`id_horarios_local`)
-REFERENCES `bd`.`horarios_local`  (`id_horarios_local`)
+REFERENCES `nearbydiscosnevents`.`horarios_local`  (`id_horarios_local`)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION
 )
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `bd`.`reserva`
+-- Table `nearbydiscosnevents`.`reserva`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bd`.`reserva` (
+CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`reserva` (
   `id_reserva` INT NOT NULL AUTO_INCREMENT,
   `usuarios_id_usu` INT NOT NULL,
   `id_estado` INT NOT NULL,
@@ -470,12 +469,12 @@ CREATE TABLE IF NOT EXISTS `bd`.`reserva` (
   UNIQUE INDEX `id_reserva_UNIQUE` (`id_reserva` ASC) VISIBLE,
   CONSTRAINT `fk_reserva_usuarios1`
     FOREIGN KEY (`usuarios_id_usu`)
-    REFERENCES `bd`.`usuarios` (`id_usu`)
+    REFERENCES `nearbydiscosnevents`.`usuarios` (`id_usu`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
     CONSTRAINT `id_estado_reserva`
     FOREIGN KEY (`id_estado`)
-    REFERENCES `bd`.`estados` (`id_estado`)
+    REFERENCES `nearbydiscosnevents`.`estados` (`id_estado`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
     CONSTRAINT `id_reserva_detalle_reserva`
@@ -486,6 +485,127 @@ CREATE TABLE IF NOT EXISTS `bd`.`reserva` (
     )
 ENGINE = InnoDB;
 
+ALTER TABLE `nearbydiscosnevents`.`personas` 
+CHANGE COLUMN `pri_nomb` `pri_nomb` VARCHAR(50) NOT NULL ,
+CHANGE COLUMN `seg_nomb` `seg_nomb` VARCHAR(50) NOT NULL ,
+CHANGE COLUMN `pri_apel` `pri_apel` VARCHAR(50) NOT NULL ,
+CHANGE COLUMN `seg_apel` `seg_apel` VARCHAR(50) NOT NULL ,
+CHANGE COLUMN `nom_comp` `nom_comp` VARCHAR(50) NOT NULL ,
+CHANGE COLUMN `tip_doc` `tip_doc` INT NOT NULL,
+CHANGE COLUMN `num_doc` `num_doc` VARCHAR(12) NOT NULL,
+CHANGE COLUMN `fec_nac` `fec_nac` DATE NOT NULL ,
+CHANGE COLUMN `genero_per` `genero_per` CHAR NOT NULL ;
+
+ALTER TABLE `nearbydiscosnevents`.`personas`
+DROP COLUMN `telf`;
+
+ALTER TABLE `nearbydiscosnevents`.`usuarios` 
+CHANGE COLUMN `nom_usu` `nom_usu` VARCHAR(45) NOT NULL ,
+CHANGE COLUMN `origen_usu` `origen_usu` VARCHAR(10) NOT NULL ;
+
+
+
+DROP procedure IF EXISTS `SP_USER_GLOBAL`;
+
+DELIMITER $$
+USE `nearbydiscosnevents`$$
+CREATE PROCEDURE `SP_USER_GLOBAL` (IN `vAccion` VARCHAR(45),
+IN `idPerson` INT, IN `firstName` VARCHAR(40), IN `secondName` VARCHAR(40),
+IN `firstLastName` VARCHAR(40), IN `secondLastName` VARCHAR(40),
+IN `fullName` VARCHAR(40), IN `documentType`INT,
+IN `documentNumber` VARCHAR(12),  IN `bornDate` DATE,
+IN `age` INT, IN `mobileNumber` INT, IN `address` VARCHAR(45), 
+IN `genre` CHAR(1), IN `idUser` INT, IN `userName` VARCHAR(45),
+IN `passwordUser` VARCHAR(45), IN `email` VARCHAR(45),
+IN `sourceUser` VARCHAR(45), IN `userStatus` INT)
+BEGIN
+	DECLARE personId INT;
+
+	IF vAccion = "registrar" THEN
+		INSERT INTO personas(
+			pri_nomb,seg_nomb,pri_apel,
+			seg_apel,nom_comp,tip_doc,
+			num_doc,fec_nac,edad,
+			direc_per,genero_per) 
+        VALUES 
+			(firstName,secondName,firstLastName,
+			secondLastName,fullName,
+			documentType,documentNumber,bornDate,
+			age,address,genre);
+        
+        SET personId = last_insert_id();
+        
+        INSERT INTO usuarios(
+			id_per, nom_usu, pass_usu,
+            email_usu, telf_usu, origen_usu, id_estado)
+		VALUES 
+			(personId, userName, passwordUser,
+            email, mobileNumber, sourceUser, userStatus); 
+    
+    END IF;
+    
+    IF vAccion = "login" THEN
+			SELECT 
+				P.id_per as personId, P.pri_nomb as firstName, P.seg_nomb as secondName, P.pri_apel as firstLastName,
+                P.seg_apel as secondLastName, P.nom_comp as fullName, P.tip_doc as documentType,
+                P.num_doc as documentNumber, P.fec_nac as bornDate, P.direc_per as address,
+                P.genero_per as genre, U.nom_usu as userName, U.email_usu as email, 
+                U.telf_usu as mobileNumber, U.id_estado as userStatus
+            FROM 
+				USUARIOS U 
+			INNER JOIN PERSONAS P ON P.id_per = U.id_per 
+            WHERE 
+				U.nom_usu = userName 
+				OR U.pass_usu = passwordUser;
+	END IF;
+	
+    IF vAccion = "obtener" THEN
+			SELECT 
+				P.id_per as personId, P.pri_nomb as firstName, P.seg_nomb as secondName, P.pri_apel as firstLastName,
+                P.seg_apel as secondLastName, P.nom_comp as fullName, P.tip_doc as documentType,
+                P.num_doc as documentNumber, P.fec_nac as bornDate, P.direc_per as address,
+                P.genero_per as genre, U.nom_usu as userName, U.email_usu as email, 
+                U.telf_usu as mobileNumber, U.id_estado as userStatus
+            FROM 
+				USUARIOS U 
+			INNER JOIN PERSONAS P ON P.id_per = U.id_per 
+            WHERE 
+				P.ide_per = idPerson 
+				OR P.num_doc = documentNumber;
+	END IF;
+    
+    IF vAccion = "estado/cambiar" THEN
+		UPDATE 
+			USUARIOS 
+		SET 
+			id_estado = userStatus 
+		WHERE 
+			id_per = idPerson;    
+    END IF;
+    
+    IF vAccion = "eliminar" THEN
+		DELETE FROM 
+			USUARIOS
+		WHERE id_per = idPerson;
+	END IF;
+    
+    IF vAccion = "datos/actualizar" THEN
+			UPDATE PERSONAS p  
+				set P.pri_nomb=firstName, P.seg_nomb=secondName, P.pri_apel=firstLastName,
+                P.seg_apel=secondLastName, P.nom_comp=fullName, P.tip_doc=documentType,
+                P.num_doc=documentNumber, P.fec_nac=bornDate, P.direc_per=address,
+                P.genero_per=genre
+			WHERE p.id_per = idPerson;
+            
+            UPDATE USUARIOS u
+				set
+					U.nom_usu = userName, U.email_usu = email, 
+					U.telf_usu = mobileNumber, U.id_estado = userStatus
+				WHERE u.id_usu = idUser;
+	END IF;
+END$$
+
+DELIMITER ;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
