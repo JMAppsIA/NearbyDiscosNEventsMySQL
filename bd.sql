@@ -21,6 +21,22 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`estados` (
 )
 ENGINE = InnoDB;
 
+INSERT INTO estados
+VALUES (default, 'Reservado'),
+(default, 'Ocupado'),
+(default, 'Abierto'),
+(default, 'Cerrado'),
+(default, 'Mantenimiento'),
+(default, 'Activo'),
+(default, 'Inactivo'),
+(default, 'Disponible'),
+(default, 'No Disponible');
+
+delete from estados;
+ALTER TABLE estados AUTO_INCREMENT = 1;
+
+select * from estados;
+
 -- -----------------------------------------------------
 -- Table `nearbydiscosnevents`.`personas`
 -- -----------------------------------------------------
@@ -38,9 +54,39 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`personas` (
   `telf` INT NOT NULL,
   `direc_per` VARCHAR(45) NOT NULL,
   `genero_per` TEXT(20) NOT NULL,
-  PRIMARY KEY (`id_per`))
+  PRIMARY KEY (`id_per`)
+  )
 ENGINE = InnoDB;
 
+insert into personas
+values ('1', 'Marlong', 'Cesar', 'Cubas', 'Nuñez', 'Marlong Cesar Cubas Nuñez', 'dni', '71642931', '1995/12/07', '24', '5570064', 'Av El Retablo', 'M'),
+('2', 'Jorge', 'JJJJ', 'Herrera', 'Tume', 'Jorge Herrera Tume', 'dni', '71642940', '1995/08/11', '24', '589623654', 'Carabayllo', 'M'),
+('3', 'Juan', 'JJJJ', 'Ortiz', 'Tume', 'Juan Ortiz Tume', 'dni', '71642941', '1995/08/11', '24', '58962', 'Carabayllo', 'M'),
+('4', 'Mario', 'Luis', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 'dni', '71642910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
+('5', 'Mario', '---', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 'dni', '71742910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
+('6', 'Macarena', 'Luis', 'Montoya', 'Lopez', 'Macarena Luis Montoya Lopez', 'dni', '71644910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
+('7', 'Tulio', 'Enrique', 'Parra', 'Lopez', 'Tulio Enrique Parra Lopez', 'dni', '71642930', '1995/12/07', '24', '5571552', 'Comas', 'M');
+
+select * from personas;
+update personas
+set seg_nomb = 'Martín'
+where seg_nomb = 'JJJJ';
+
+
+-- -----------------------------------------------------
+-- Table `bd`.`origen_usuarios`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bd`.`origen_usuarios`(
+`id_origen_usu` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`nom_origen_usu` VARCHAR(45) NOT NULL
+)
+ENGINE = InnoDB;
+
+insert into origen_usuarios
+values (default,'facebook'),
+(default,'gmail');
+
+select * from origen_usuarios;
 
 -- -----------------------------------------------------
 -- Table `nearbydiscosnevents`.`usuarios`
@@ -52,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`usuarios` (
   `pass_usu` VARCHAR(45) NOT NULL,
   `email_usu` VARCHAR(45) NOT NULL,
   `telf_usu` INT NOT NULL,
-  `origen_usu` TEXT(40) NOT NULL,
+  `id_origen_usu` INT NOT NULL,
   `id_estado` INT NOT NULL,
   PRIMARY KEY (`id_usu`),
   UNIQUE INDEX `pass_usu_UNIQUE` (`pass_usu` ASC) VISIBLE,
@@ -60,17 +106,33 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`usuarios` (
   INDEX `id_per_idx` (`id_per` ASC) VISIBLE,
   CONSTRAINT `id_per`
     FOREIGN KEY (`id_per`)
-    REFERENCES `nearbydiscosnevents`.`personas` (`id_per`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    REFERENCES `bd`.`personas` (`id_per`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_origen_usu_usuarios`
+  FOREIGN KEY (`id_origen_usu`)
+  REFERENCES `bd`.`origen_usuarios` (`id_origen_usu`)
+  ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `id_estado_usuarios`
     FOREIGN KEY (`id_estado`)
-    REFERENCES `nearbydiscosnevents`.`estados` (`id_estado`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+DROP TABLE USUARIOS;
+DELETE FROM USUARIOS;
 
+insert into usuarios
+values('1','1','marlong','marlong123','marlongcubas@gmail.com','943697336','1','6'),
+('2','2','jorge','jorge123','jorge.herrera.tume@gmail.com','943697340','2','6');
+
+update usuarios
+set telf_usu = '991603069'
+where telf_usu = '943697340';
+
+select * from usuarios;
 
 -- -----------------------------------------------------
 -- Table `nearbydiscosnevents`.`locales`
@@ -82,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`locales` (
   `precio_local` FLOAT NOT NULL,
   `lat_local` FLOAT NOT NULL,
   `long_local` FLOAT NOT NULL,
-  `descrip_local` VARCHAR(500) NOT NULL,
+  `descrip_local` LONGTEXT NOT NULL,
   `telf_local` INT NOT NULL,
   `direc_local` VARCHAR(45) NOT NULL,
   `id_estado` INT NOT NULL,
@@ -93,9 +155,10 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`locales` (
   UNIQUE INDEX `telf_local_UNIQUE` (`telf_local` ASC) VISIBLE,
   CONSTRAINT `id_estado_locales`
     FOREIGN KEY (`id_estado`)
-    REFERENCES `nearbydiscosnevents`.`estados` (`id_estado`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    )
 ENGINE = InnoDB;
 
 
@@ -117,7 +180,7 @@ CONSTRAINT `id_local_votacion_local`
     FOREIGN KEY (`id_local`)
     REFERENCES `nearbydiscosnevents`.`locales` (`id_local`)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE
+    ON UPDATE NO ACTION
 ) ;
 
 
@@ -156,9 +219,9 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`catering` (
   PRIMARY KEY (`id_cater`),
   CONSTRAINT `id_estado_catering`
     FOREIGN KEY (`id_estado`)
-    REFERENCES `nearbydiscosnevents`.`estados` (`id_estado`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
     )
     
 ENGINE = InnoDB;
@@ -201,14 +264,14 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`shows` (
   INDEX `id_local_idx` (`id_local` ASC) VISIBLE,
   CONSTRAINT `id_local`
     FOREIGN KEY (`id_local`)
-    REFERENCES `nearbydiscosnevents`.`locales` (`id_local`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    REFERENCES `bd`.`locales` (`id_local`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
     CONSTRAINT `id_estado_shows`
     FOREIGN KEY (`id_estado`)
-    REFERENCES `nearbydiscosnevents`.`estados` (`id_estado`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
     )
 ENGINE = InnoDB;
 
@@ -223,6 +286,9 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`categ_prod` (
   )
 ENGINE = InnoDB;
 
+
+DROP TABLE categ_prod;
+select * from categ_prod;
 -- -----------------------------------------------------
 -- Table `nearbydiscosnevents`.`productos`
 -- -----------------------------------------------------
@@ -241,9 +307,9 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`productos` (
   INDEX `fk_productos_usuarios1_idx` (`usuarios_id_usu` ASC) VISIBLE,
   CONSTRAINT `id_cater_productos`
     FOREIGN KEY (`id_cater`)
-    REFERENCES `nearbydiscosnevents`.`catering` (`id_cater`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    REFERENCES `bd`.`catering` (`id_cater`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `fk_productos_usuarios1`
     FOREIGN KEY (`usuarios_id_usu`)
     REFERENCES `nearbydiscosnevents`.`usuarios` (`id_usu`)
@@ -267,19 +333,19 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`orden_detalle`(
     `id_show` INT NOT NULL,
     CONSTRAINT `id_local_orden_detalle`
     FOREIGN KEY (`id_local`)
-    REFERENCES `nearbydiscosnevents`.`locales` (`id_local`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    REFERENCES `bd`.`locales` (`id_local`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
     CONSTRAINT `id_prod_orden_detalle`
     FOREIGN KEY (`id_prod`)
-    REFERENCES `nearbydiscosnevents`.`productos` (`id_prod`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    REFERENCES `bd`.`productos` (`id_prod`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
     CONSTRAINT `id_show_orden_detalle`
     FOREIGN KEY (`id_show`)
-    REFERENCES `nearbydiscosnevents`.`shows` (`id_show`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+    REFERENCES `bd`.`shows` (`id_show`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 )
 ENGINE = InnoDB;
 
@@ -294,9 +360,9 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`orden_compra` (
   `id_orden_detalle` INT NOT NULL,
   CONSTRAINT `id_orden_detalle_orden_compra`
   FOREIGN KEY (`id_orden_detalle`)
-  REFERENCES `nearbydiscosnevents`.`orden_detalle` (`id_orden_detalle`)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE
+  REFERENCES `bd`.`orden_detalle` (`id_orden_detalle`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION
   )
 ENGINE = InnoDB;
 
@@ -323,8 +389,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `nearbydiscosnevents`.`tarjeta_usuario`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`tarjeta_usuario` (
-  `id_tarjeta` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `bd`.`tarjeta_usuario` (
+  `id_tarjeta` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `usuarios_id_usu` INT NOT NULL,
   `id_entidad_bancaria` INT NOT NULL,
   `num_tarj` INT NOT NULL,
@@ -347,7 +413,12 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`tarjeta_usuario` (
 	FOREIGN KEY (`id_tipo_tarjeta`)
     REFERENCES `nearbydiscosnevents`.`tipo_tarjeta` (`id`)
     ON DELETE NO ACTION
-	ON UPDATE NO ACTION
+	ON UPDATE NO ACTION,
+    CONSTRAINT `id_estado`
+    FOREIGN KEY (`id_estado`)
+    REFERENCES `bd`.`estados` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
     )
 ENGINE = InnoDB;
 
@@ -401,14 +472,14 @@ CREATE TABLE IF NOT EXISTS `nearbydiscosnevents`.`reserva` (
     REFERENCES `nearbydiscosnevents`.`usuarios` (`id_usu`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-    CONSTRAINT `id_reserva_detalle`
-    FOREIGN KEY (`id_reserva_detalle`)
-    REFERENCES `nearbydiscosnevents`.`reserva.detalle` (`id_reserva_detalle`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
     CONSTRAINT `id_estado_reserva`
     FOREIGN KEY (`id_estado`)
     REFERENCES `nearbydiscosnevents`.`estados` (`id_estado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `id_reserva_detalle_reserva`
+    FOREIGN KEY (`id_reserva_detalle`)
+    REFERENCES `bd`.`reserva.detalle` (`id_reserva_detalle`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
     )
