@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `bd`.`personas` (
   `pri_apel` TEXT(45) NOT NULL,
   `seg_apel` TEXT(45) NOT NULL,
   `nom_comp` TEXT(100) NOT NULL,
-  `tip_doc` TEXT(50) NOT NULL,
+  `tip_doc` INT NOT NULL,
   `num_doc` INT NOT NULL,
   `fec_nac` DATETIME NOT NULL,
   `edad` INT NOT NULL,
@@ -59,13 +59,13 @@ CREATE TABLE IF NOT EXISTS `bd`.`personas` (
 ENGINE = InnoDB;
 
 insert into personas
-values ('1', 'Marlong', 'Cesar', 'Cubas', 'Nuñez', 'Marlong Cesar Cubas Nuñez', 'dni', '71642931', '1995/12/07', '24', '5570064', 'Av El Retablo', 'M'),
-('2', 'Jorge', 'JJJJ', 'Herrera', 'Tume', 'Jorge Herrera Tume', 'dni', '71642940', '1995/08/11', '24', '589623654', 'Carabayllo', 'M'),
-('3', 'Juan', 'JJJJ', 'Ortiz', 'Tume', 'Juan Ortiz Tume', 'dni', '71642941', '1995/08/11', '24', '58962', 'Carabayllo', 'M'),
-('4', 'Mario', 'Luis', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 'dni', '71642910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
-('5', 'Mario', '---', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 'dni', '71742910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
-('6', 'Macarena', 'Luis', 'Montoya', 'Lopez', 'Macarena Luis Montoya Lopez', 'dni', '71644910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
-('7', 'Tulio', 'Enrique', 'Parra', 'Lopez', 'Tulio Enrique Parra Lopez', 'dni', '71642930', '1995/12/07', '24', '5571552', 'Comas', 'M');
+values ('1', 'Marlong', 'Cesar', 'Cubas', 'Nuñez', 'Marlong Cesar Cubas Nuñez', 2, '71642931', '1995/12/07', '24', '5570064', 'Av El Retablo', 'M'),
+('2', 'Jorge', 'JJJJ', 'Herrera', 'Tume', 'Jorge Herrera Tume', 2, '71642940', '1995/08/11', '24', '589623654', 'Carabayllo', 'M'),
+('3', 'Juan', 'JJJJ', 'Ortiz', 'Tume', 'Juan Ortiz Tume', 2, '71642941', '1995/08/11', '24', '58962', 'Carabayllo', 'M'),
+('4', 'Mario', 'Luis', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 2, '71642910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
+('5', 'Mario', '---', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 2, '71742910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
+('6', 'Macarena', 'Luis', 'Montoya', 'Lopez', 'Macarena Luis Montoya Lopez', 2, '71644910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
+('7', 'Tulio', 'Enrique', 'Parra', 'Lopez', 'Tulio Enrique Parra Lopez', 2, '71642930', '1995/12/07', '24', '5571552', 'Comas', 'M');
 
 select * from personas;
 update personas
@@ -121,8 +121,8 @@ CREATE TABLE IF NOT EXISTS `bd`.`usuarios` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-DROP TABLE USUARIOS;
-DELETE FROM USUARIOS;
+
+
 
 insert into usuarios
 values('1','1','marlong','marlong123','marlongcubas@gmail.com','943697336','1','6'),
@@ -287,8 +287,7 @@ CREATE TABLE IF NOT EXISTS `bd`.`categ_prod` (
 ENGINE = InnoDB;
 
 
-DROP TABLE categ_prod;
-select * from categ_prod;
+
 -- -----------------------------------------------------
 -- Table `bd`.`productos`
 -- -----------------------------------------------------
@@ -390,7 +389,7 @@ ENGINE = InnoDB;
 -- Table `bd`.`tarjeta_usuario`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `bd`.`tarjeta_usuario` (
-  `id_tarjeta` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `id_tarjeta` INT NOT NULL AUTO_INCREMENT,
   `usuarios_id_usu` INT NOT NULL,
   `id_entidad_bancaria` INT NOT NULL,
   `num_tarj` INT NOT NULL,
@@ -501,7 +500,7 @@ DROP COLUMN `telf`;
 
 ALTER TABLE `bd`.`usuarios` 
 CHANGE COLUMN `nom_usu` `nom_usu` VARCHAR(45) NOT NULL ,
-CHANGE COLUMN `origen_usu` `origen_usu` VARCHAR(10) NOT NULL ,
+CHANGE COLUMN `id_origen_usu` `id_origen_usu`INT NOT NULL ,
 CHANGE COLUMN `pass_usu` `pass_usu` LONGTEXT NOT NULL ,
 DROP INDEX `pass_usu_UNIQUE` ;
 
