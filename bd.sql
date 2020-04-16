@@ -32,11 +32,6 @@ VALUES (default, 'Reservado'),
 (default, 'Disponible'),
 (default, 'No Disponible');
 
-delete from estados;
-ALTER TABLE estados AUTO_INCREMENT = 1;
-
-select * from estados;
-
 -- -----------------------------------------------------
 -- Table `bd`.`personas`
 -- -----------------------------------------------------
@@ -60,17 +55,12 @@ ENGINE = InnoDB;
 
 insert into personas
 values ('1', 'Marlong', 'Cesar', 'Cubas', 'Nuñez', 'Marlong Cesar Cubas Nuñez', 2, '71642931', '1995/12/07', '24', '5570064', 'Av El Retablo', 'M'),
-('2', 'Jorge', 'JJJJ', 'Herrera', 'Tume', 'Jorge Herrera Tume', 2, '71642940', '1995/08/11', '24', '589623654', 'Carabayllo', 'M'),
+('2', 'Jorge', 'Martin', 'Herrera', 'Tume', 'Jorge Martin Herrera Tume', 2, '71642940', '1995/08/11', '24', '589623654', 'Carabayllo', 'M'),
 ('3', 'Juan', 'JJJJ', 'Ortiz', 'Tume', 'Juan Ortiz Tume', 2, '71642941', '1995/08/11', '24', '58962', 'Carabayllo', 'M'),
 ('4', 'Mario', 'Luis', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 2, '71642910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
 ('5', 'Mario', '---', 'Parra', 'Lopez', 'Mario Luis Parra Lopez', 2, '71742910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
 ('6', 'Macarena', 'Luis', 'Montoya', 'Lopez', 'Macarena Luis Montoya Lopez', 2, '71644910', '1995/12/07', '24', '5571552', 'Comas', 'M'),
 ('7', 'Tulio', 'Enrique', 'Parra', 'Lopez', 'Tulio Enrique Parra Lopez', 2, '71642930', '1995/12/07', '24', '5571552', 'Comas', 'M');
-
-select * from personas;
-update personas
-set seg_nomb = 'Martín'
-where seg_nomb = 'JJJJ';
 
 
 -- -----------------------------------------------------
@@ -85,8 +75,6 @@ ENGINE = InnoDB;
 insert into origen_usuarios
 values (default,'facebook'),
 (default,'gmail');
-
-select * from origen_usuarios;
 
 -- -----------------------------------------------------
 -- Table `bd`.`usuarios`
@@ -126,13 +114,7 @@ ENGINE = InnoDB;
 
 insert into usuarios
 values('1','1','marlong','marlong123','marlongcubas@gmail.com','943697336','1','6'),
-('2','2','jorge','jorge123','jorge.herrera.tume@gmail.com','943697340','2','6');
-
-update usuarios
-set telf_usu = '991603069'
-where telf_usu = '943697340';
-
-select * from usuarios;
+('2','2','jorge','jorge123','jorge.herrera.tume@gmail.com','997603069','2','6');
 
 -- -----------------------------------------------------
 -- Table `bd`.`locales`
@@ -493,7 +475,8 @@ CHANGE COLUMN `nom_comp` `nom_comp` VARCHAR(50) NOT NULL ,
 CHANGE COLUMN `tip_doc` `tip_doc` INT NOT NULL,
 CHANGE COLUMN `num_doc` `num_doc` VARCHAR(12) NOT NULL,
 CHANGE COLUMN `fec_nac` `fec_nac` DATE NOT NULL ,
-CHANGE COLUMN `genero_per` `genero_per` CHAR NOT NULL ;
+CHANGE COLUMN `genero_per` `genero_per` CHAR NOT NULL,
+CHANGE COLUMN `nom_comp` `nom_comp` VARCHAR(120) NOT NULL ;
 
 ALTER TABLE `bd`.`personas`
 DROP COLUMN `telf`;
@@ -511,12 +494,12 @@ USE `bd`$$
 CREATE PROCEDURE `SP_USER_GLOBAL` (IN `vAccion` VARCHAR(45),
 IN `idPerson` INT, IN `firstName` VARCHAR(40), IN `secondName` VARCHAR(40),
 IN `firstLastName` VARCHAR(40), IN `secondLastName` VARCHAR(40),
-IN `fullName` VARCHAR(40), IN `documentType`INT,
+IN `fullName` VARCHAR(120), IN `documentType`INT,
 IN `documentNumber` VARCHAR(12),  IN `bornDate` DATE,
 IN `age` INT, IN `mobileNumber` INT, IN `address` VARCHAR(45), 
 IN `genre` CHAR(1), IN `idUser` INT, IN `userName` VARCHAR(45),
 IN `passwordUser` LONGTEXT, IN `email` VARCHAR(45),
-IN `sourceUser` VARCHAR(45), IN `userStatus` INT)
+IN `sourceUser`INT, IN `userStatus` INT)
 BEGIN
 	DECLARE personId INT;
 
@@ -536,7 +519,7 @@ BEGIN
         
         INSERT INTO usuarios(
 			id_per, nom_usu, pass_usu,
-            email_usu, telf_usu, origen_usu, id_estado)
+            email_usu, telf_usu, id_origen_usu, id_estado)
 		VALUES 
 			(personId, userName, passwordUser,
             email, mobileNumber, sourceUser, userStatus); 
@@ -547,31 +530,30 @@ BEGIN
 			SELECT 
 				P.id_per as personId, P.pri_nomb as firstName, P.seg_nomb as secondName, P.pri_apel as firstLastName,
                 P.seg_apel as secondLastName, P.nom_comp as fullName, P.tip_doc as documentType,
-                P.num_doc as documentNumber, P.fec_nac as bornDate, P.direc_per as address,
+                P.num_doc as documentNumber, DATE_FORMAT(P.fec_nac,'%d/%m/%Y') as bornDate, P.direc_per as address,
                 P.genero_per as genre, U.nom_usu as userName, U.email_usu as email, 
-                U.telf_usu as mobileNumber, E.nom_estado as userStatus
+                U.telf_usu as mobileNumber, E.nom_estado as userStatus, E.id_estado as statudID
             FROM 
 				USUARIOS U 
 			INNER JOIN PERSONAS P ON P.id_per = U.id_per 
             INNER JOIN ESTADOS E ON E.id_estado = U.id_estado
             WHERE 
 				U.nom_usu = userName 
-				AND U.pass_usu = passwordUser
-                AND U.id_estado = 1;
+				AND U.pass_usu = passwordUser;
 	END IF;
 	
     IF vAccion = "obtener" THEN
 			SELECT 
 				P.id_per as personId, P.pri_nomb as firstName, P.seg_nomb as secondName, P.pri_apel as firstLastName,
                 P.seg_apel as secondLastName, P.nom_comp as fullName, P.tip_doc as documentType,
-                P.num_doc as documentNumber, P.fec_nac as bornDate, P.direc_per as address,
+                P.num_doc as documentNumber, DATE_FORMAT(P.fec_nac,'%d/%m/%Y') as bornDate, P.direc_per as address,
                 P.genero_per as genre, U.nom_usu as userName, U.email_usu as email, 
                 U.telf_usu as mobileNumber, U.id_estado as userStatus
             FROM 
 				USUARIOS U 
 			INNER JOIN PERSONAS P ON P.id_per = U.id_per 
             WHERE 
-				P.ide_per = idPerson 
+				P.id_per = idPerson 
 				OR P.num_doc = documentNumber;
 	END IF;
     
@@ -595,20 +577,33 @@ BEGIN
 	END IF;
     
     IF vAccion = "datos/actualizar" THEN
-			UPDATE PERSONAS p  
+			UPDATE PERSONAS p, USUARIOS u  
 				set P.pri_nomb=firstName, P.seg_nomb=secondName, P.pri_apel=firstLastName,
                 P.seg_apel=secondLastName, P.nom_comp=fullName, P.tip_doc=documentType,
                 P.num_doc=documentNumber, P.fec_nac=bornDate, P.direc_per=address,
-                P.genero_per=genre
-			WHERE p.id_per = idPerson;
-            
-            UPDATE USUARIOS u
-				set
-					U.nom_usu = userName, U.email_usu = email, 
-					U.telf_usu = mobileNumber, U.id_estado = userStatus
-				WHERE u.id_usu = idUser;
+                P.genero_per=genre, U.nom_usu = userName, U.email_usu = email, 
+				U.telf_usu = mobileNumber, U.id_estado = userStatus
+			WHERE p.id_per = idPerson
+            AND u.id_per = idPerson;
+
 	END IF;
 END$$
+
+CREATE TABLE tipo_doc
+(
+id INT PRIMARY KEY AUTO_INCREMENT,
+descripcion VARCHAR(200)
+);
+
+INSERT INTO tipo_doc(descripcion) values ('DNI'),('C.E.');
+
+delete from usuarios;
+delete from personas;
+
+ALTER TABLE personas
+add CONSTRAINT `id_tipo_doc_persona`
+FOREIGN KEY personas(tip_doc)
+REFERENCES tipo_doc (id) on update no action on delete no action;
 
 DELIMITER ;
 
