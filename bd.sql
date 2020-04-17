@@ -497,7 +497,7 @@ IN `firstLastName` VARCHAR(40), IN `secondLastName` VARCHAR(40),
 IN `fullName` VARCHAR(120), IN `documentType`INT,
 IN `documentNumber` VARCHAR(12),  IN `bornDate` DATE,
 IN `age` INT, IN `mobileNumber` INT, IN `address` VARCHAR(45), 
-IN `genre` CHAR(1), IN `idUser` INT, IN `userName` VARCHAR(45),
+IN `genre` INT, IN `idUser` INT, IN `userName` VARCHAR(45),
 IN `passwordUser` LONGTEXT, IN `email` VARCHAR(45),
 IN `sourceUser`INT, IN `userStatus` INT)
 BEGIN
@@ -589,6 +589,8 @@ BEGIN
 	END IF;
 END$$
 
+DELIMITER ;
+
 CREATE TABLE tipo_doc
 (
 id INT PRIMARY KEY AUTO_INCREMENT,
@@ -597,17 +599,34 @@ descripcion VARCHAR(200)
 
 INSERT INTO tipo_doc(descripcion) values ('DNI'),('C.E.');
 
+CREATE TABLE tipo_genero
+(
+id INT PRIMARY KEY AUTO_INCREMENT,
+descripcion VARCHAR(200)
+);
+INSERT INTO tipo_genero(descripcion) values ('Masculino'),('Femenino'),('No determinado');
+
 delete from usuarios;
 delete from personas;
+
+ALTER TABLE `bd`.`personas` 
+CHANGE COLUMN `genero_per` `genero_per` INT NOT NULL ;
+
+ALTER TABLE `bd`.`personas` 
+CHANGE COLUMN `pri_nomb` `pri_nomb` VARCHAR(50) NULL ,
+CHANGE COLUMN `seg_nomb` `seg_nomb` VARCHAR(50) NULL ,
+CHANGE COLUMN `pri_apel` `pri_apel` VARCHAR(50) NULL ,
+CHANGE COLUMN `seg_apel` `seg_apel` VARCHAR(50) NULL ;
 
 ALTER TABLE personas
 add CONSTRAINT `id_tipo_doc_persona`
 FOREIGN KEY personas(tip_doc)
 REFERENCES tipo_doc (id) on update no action on delete no action;
 
-DELIMITER ;
-
-
+ALTER TABLE personas
+add CONSTRAINT `id_tipo_genero_persona`
+FOREIGN KEY personas(genero_per)
+REFERENCES tipo_genero (id) on update no action on delete no action;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
